@@ -44,11 +44,22 @@ if ( ! class_exists( 'NGD_wpSimplePostView' ) ) {
 			
 			global $user_ID, $post;			
 			
+			// Bail early if $post is not set or not an object
+			if ( ! isset( $post ) || ! is_a( $post, 'WP_Post' ) ) {
+				return;
+			}
+
 			if ( is_int( $post ) ) {
 				$post = get_post( $post );
 			}
 			
 			$id = (int) $post->ID;
+
+			// Do not proceed if not a single post view
+			if ( ! is_single( $id ) || wp_is_post_revision( $id ) || is_preview() ) {
+				return;
+			}
+
 			$currentIP = NGD_wpSimplePostView::ngd_getCurrentIPAddressForPostView();
 			
 			$is_post_view = false;
