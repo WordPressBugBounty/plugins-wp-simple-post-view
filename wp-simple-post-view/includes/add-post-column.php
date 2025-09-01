@@ -19,19 +19,29 @@ if ( ! class_exists( 'NGD_wpSimplePostView_Admin' ) ) {
 			add_filter( 'request', array( 'NGD_wpSimplePostView_Admin', 'ngd_hits_column_orderby') );
 		}
 		
-		//Add filter to the request to make the hits sorting process numeric, not string
-		public static function ngd_hits_column_orderby( $vars ) {			
-		    if ( isset( $vars['orderby'] ) && 'post_view' == $vars['orderby'] ) {
+		/**
+		 * Filter the request to allow sorting by post view count.
+		 *
+		 * @param array $vars Query vars.
+		 * @return array Modified query vars.
+		 */
+		public static function ngd_hits_column_orderby( $vars ) {
+		    if ( isset( $vars['orderby'] ) && 'post_view' === $vars['orderby'] ) {
 
-		    	$isPostCountExists = get_post_meta( 'post_view' );
-		        if( ! isset( $isPostCountExists ) && empty( $isPostCountExists ) ) {
-		        	return $vars;
-		        }
-		        
-		        $vars = array_merge( $vars, array(
-		            'meta_key' => 'post_view',
-		            'orderby' => 'meta_value_num'
-		        ) );
+		        /*
+		         * phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		         * We need to query by meta_key 'post_view' to enable sorting by post views.
+		         * This may have performance implications on large sites, but it's the
+		         * standard WordPress approach for sorting by custom fields.
+		         */
+		        $vars = array_merge(
+		            $vars,
+		            [
+		                'meta_key' => 'post_view',
+		                'orderby'  => 'meta_value_num',
+		            ]
+		        );
+		        // phpcs:enable
 		    }
 
 		    return $vars;
@@ -44,30 +54,30 @@ if ( ! class_exists( 'NGD_wpSimplePostView_Admin' ) ) {
 		}
 		
 		public static function ngd_addPostView_filter_posts_columns( $columns ) {
-  		  
-  		  $wp_simple_post_view_text = esc_attr( get_option( 'wp_simple_post_view_text' ) );
-          if( empty( $wp_simple_post_view_text ) ) {
-        	$wp_simple_post_view_text = __( 'Post View', 'wp-simple-post-view' );
-          }
 
-		  $columns['post_view'] = __( "$wp_simple_post_view_text", 'wp-simple-post-view' );
-		  return $columns;
+		    $wp_simple_post_view_text = esc_attr( get_option( 'wp_simple_post_view_text' ) );
+
+		    if ( empty( $wp_simple_post_view_text ) ) {
+		        // translators: Default label for the post views column in the posts table.
+		        $wp_simple_post_view_text = __( 'Post View', 'wp-simple-post-view' );
+		    }
+
+		    $columns['post_view'] = $wp_simple_post_view_text;
+
+		    return $columns;
 		}
 
 		public static function ngd_PostView_post_column( $column, $post_id ) {
-		  // Post View column
-		  if ( 'post_view' === $column ) {
-		  	$post_view_count = get_post_meta($post_id, 'post_view', true);
-		  	if( ! empty( $post_view_count ) ){
-		  		if( is_numeric( $post_view_count ) ){
-		  			echo $post_view_count;
-		  		}else{
-		  			echo 0;
-		  		}
-		  	}else{
-		  		echo 0;
-		  	}
-		  }
+		    // Post View column
+		    if ( 'post_view' === $column ) {
+		        $post_view_count = get_post_meta( $post_id, 'post_view', true );
+
+		        // Ensure it's a valid number
+		        $post_view_count = is_numeric( $post_view_count ) ? $post_view_count : 0;
+
+		        // Escape output before printing
+		        echo esc_html( $post_view_count );
+		    }
 		}
 
 	}

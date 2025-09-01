@@ -31,34 +31,53 @@ if ( ! class_exists( 'NGD_wpSimplePostView_Admin_AddMetaBox' ) ) {
 		}
 
 		public static function ngd_addPostViewMetaBoxHTMLFun($post) {
-			if(isset($post)) {
-			$postView = __( 'Post View', 'wp-simple-post-view' );
-			$value = get_post_meta($post->ID, 'post_view', true); ?>
-			<label for="wporg_field"><strong><?php echo $postView;?></strong></label>
-			<?php wp_nonce_field( 'wpspv_action', 'wpspv_field' ); ?>
-		    <input type="number" name="post_view" style="width: 70%;" placeholder="0" value="<?php echo esc_attr($value);?>">
-			<?php }
+		    if (isset($post)) {
+		        $postView = __( 'Post View', 'wp-simple-post-view' );
+		        $value = get_post_meta($post->ID, 'post_view', true); ?>
+		        
+		        <label for="wporg_field"><strong><?php echo esc_html($postView); ?></strong></label>
+		        <?php wp_nonce_field( 'wpspv_action', 'wpspv_field' ); ?>
+		        <input type="number" name="post_view" style="width: 70%;" placeholder="0" value="<?php echo esc_attr($value); ?>">
+		        
+		    <?php }
 		}
 
 		public static function ngd_addPostViewMetaBoxSavePostdata($post_id) {
-            
-			if( get_post_type( $post_id ) === 'post' ) {
-                if ( array_key_exists( 'post_view', $_POST ) ) {                    
-                    $screen = esc_attr( $_REQUEST['screen'] );
-                    $action = esc_attr( $_REQUEST['action'] );
-                    if( $screen == 'edit-post' && $action == 'inline-save' ) {
-                        return;
-                    }
-                    
-			        $postViewValue = '';
-			        if ( isset( $_POST['post_view'] ) ) {
-						$postViewValue = sanitize_title( $_POST['post_view'] );
-					}
 
-			        update_post_meta( $post_id, 'post_view', $postViewValue );
-			    }         
+		    // Only for posts
+		    if ( get_post_type( $post_id ) !== 'post' ) {
+		        return;
+		    }
+
+		    // Check if nonce is set and valid
+			if ( ! isset( $_POST['wpspv_field'] ) || ! wp_verify_nonce( sanitize_text_field ( wp_unslash( $_POST['wpspv_field'] ) ), 'wpspv_action' ) ) {
+			    return;
 			}
+
+		    // Prevent autosave
+		    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		        return;
+		    }
+
+		    // Optional: check user capability
+		    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		        return;
+		    }
+
+		    // Check for inline edit (bulk edit) and exit
+		    $screen  = isset( $_REQUEST['screen'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['screen'] ) ) : '';
+		    $action  = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+		    if ( $screen === 'edit-post' && $action === 'inline-save' ) {
+		        return;
+		    }
+
+		    // Get and sanitize post_view
+		    if ( isset( $_POST['post_view'] ) ) {
+		        $post_view_value = intval( wp_unslash( $_POST['post_view'] ) ); // number field, cast to integer
+		        update_post_meta( $post_id, 'post_view', $post_view_value );
+		    }
 		}
+
 	}
 }
 

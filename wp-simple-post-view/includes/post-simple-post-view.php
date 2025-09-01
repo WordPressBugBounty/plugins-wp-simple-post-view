@@ -18,23 +18,36 @@ if ( ! class_exists( 'NGD_wpSimplePostView' ) ) {
 		}
 
 		public function ngd_getCurrentIPAddressForPostView() {
-			
-			$ipaddress = '';
-		    if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-		        $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-		    } elseif( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		        $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		    } elseif( isset( $_SERVER['HTTP_X_FORWARDED'] ) ){
-		        $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-		    } elseif( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
-		        $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-		    } elseif( isset( $_SERVER['HTTP_FORWARDED'] ) ) {
-		       $ipaddress = $_SERVER['HTTP_FORWARDED'];
-		    } elseif( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-		        $ipaddress = $_SERVER['REMOTE_ADDR'];
-		    } else {
+		    $ipaddress = '';
+
+		    $server_keys = array(
+		        'HTTP_CLIENT_IP',
+		        'HTTP_X_FORWARDED_FOR',
+		        'HTTP_X_FORWARDED',
+		        'HTTP_FORWARDED_FOR',
+		        'HTTP_FORWARDED',
+		        'REMOTE_ADDR'
+		    );
+
+		    foreach ( $server_keys as $key ) {
+		        if ( ! empty( $_SERVER[ $key ] ) ) {
+		            // Remove slashes and sanitize
+		            $ipaddress = sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) );
+
+		            // If HTTP_X_FORWARDED_FOR contains multiple IPs, take the first one
+		            if ( $key === 'HTTP_X_FORWARDED_FOR' && strpos( $ipaddress, ',' ) !== false ) {
+		                $ip_array = explode( ',', $ipaddress );
+		                $ipaddress = trim( $ip_array[0] );
+		            }
+
+		            break;
+		        }
+		    }
+
+		    if ( empty( $ipaddress ) ) {
 		        $ipaddress = 'UNKNOWN';
 		    }
+
 		    return $ipaddress;
 		}
 
@@ -95,51 +108,59 @@ if ( ! class_exists( 'NGD_wpSimplePostView' ) ) {
 		}
 
 		public function ngd_getPostView() {
-			$postViewValue = get_post_meta( get_the_ID(), 'post_view', true );
-			if(empty($postViewValue)) {
-				$postViewValue = 0;
-			}
+		    $postViewValue = get_post_meta( get_the_ID(), 'post_view', true );
+		    if ( empty( $postViewValue ) ) {
+		        $postViewValue = 0;
+		    }
 
-			$wp_simple_post_view_text = esc_attr( get_option('wp_simple_post_view_text') );
-            if( empty( $wp_simple_post_view_text ) ) {
-        	  $wp_simple_post_view_text = 'Post View';
-            }
+		    // Default label for translation
+		    $default_label = __( 'Post View', 'wp-simple-post-view' );
 
-			$postViews = (int) $postViewValue;
-			$postViewLabel = __( $wp_simple_post_view_text, 'wp-simple-post-view' );
-			$postViews = '<div class="formated_post_view"><span>'. $postViewLabel .' : </span> '.$postViews.'</div>';
-			echo apply_filters('get_post_view', $postViews);
+		    // Allow user to override via settings
+		    $wp_simple_post_view_text = esc_attr( get_option('wp_simple_post_view_text') );
+		    if ( empty( $wp_simple_post_view_text ) ) {
+		        $postViewLabel = $default_label;
+		    } else {
+		        $postViewLabel = $wp_simple_post_view_text; // no translation needed
+		    }
+
+		    $postViews = '<div class="formated_post_view"><span>' . esc_html( $postViewLabel ) . ' : </span> ' . esc_html( (int) $postViewValue ) . '</div>';
+
+		    // Escape after applying filter, allowing safe HTML
+		    echo wp_kses_post( apply_filters( 'get_post_view', $postViews ) );
 		}
-
 
 		public function ngd_single_post_view_shortcode_fun( $atts ) {
 
-			global $user_ID, $post;
-			if( get_post_type($post->ID) != 'post' ) {
-				return;
-			}
+		    global $post;
 
-			$attributes = shortcode_atts( array( 'id' => 0 ), $atts );
-			$id = (int) $attributes['id'];
-			if( $id === 0) {
-				$id = get_the_ID();
-			}
+		    if ( get_post_type( $post->ID ) !== 'post' ) {
+		        return;
+		    }
 
-			$postViewValue = get_post_meta( $id, 'post_view', true );
-			if(empty($postViewValue)) {
-				$postViewValue = 0;
-			}
+		    $attributes = shortcode_atts( array( 'id' => 0 ), $atts );
+		    $id = (int) $attributes['id'];
+		    if ( $id === 0 ) {
+		        $id = get_the_ID();
+		    }
 
-			$wp_simple_post_view_text = esc_attr( get_option('wp_simple_post_view_text') );
-            if( empty( $wp_simple_post_view_text ) ) {
-        	  $wp_simple_post_view_text = 'Post View';
-            }
-            
-			$postViews = (int) $postViewValue;
-			$postViewLabel = __( $wp_simple_post_view_text, 'wp-simple-post-view' );
-			$postViews = '<div class="formated_post_view"><span>'. $postViewLabel .' : </span> '.$postViews.'</div>';
-			return apply_filters( 'get_post_view', $postViews );
+		    // Get post view count
+		    $postViewValue = get_post_meta( $id, 'post_view', true );
+		    $postViewValue = is_numeric( $postViewValue ) ? $postViewValue : 0;
+
+		    // Default label (literal string for translation)
+		    $default_label = __( 'Post View', 'wp-simple-post-view' );
+
+		    // Get user-defined label from settings
+		    $wp_simple_post_view_text = esc_attr( get_option( 'wp_simple_post_view_text' ) );
+		    $postViewLabel = ! empty( $wp_simple_post_view_text ) ? $wp_simple_post_view_text : $default_label;
+
+		    // Build output
+		    $postViews = '<div class="formated_post_view"><span>' . esc_html( $postViewLabel ) . ' : </span> ' . esc_html( $postViewValue ) . '</div>';
+
+		    return apply_filters( 'get_post_view', $postViews );
 		}
+
 
 	}
 

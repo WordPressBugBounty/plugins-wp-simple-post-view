@@ -1,38 +1,30 @@
 === Post View Count ===
 Contributors: nareshparmar827, dipakparmar443
+Donate link: https://www.paypal.me/dipakparmar443/
 Tags: count, view, postviews, counter
 Requires at least: 6.8
-Tested up to: 6.8.1
-Stable tag: 3.0
-Author: Naresh Parmar
-Author URI: https://profiles.wordpress.org/nareshparmar827/
-Plugin URI: https://wordpress.org/plugins/wp-simple-post-view/
-Version: 3.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tested up to: 6.8
+Stable tag: 3.1
+License: GPLv3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Add an "Post View Count" plugin get count views of your posts.
-
+Add a "Post View Count" plugin to get the count of views for your posts.
 
 == Description ==
 
-"Post View Count" is easy to use and light weight post views count plugin. it allow you to display how many times a post type had been viewed.
+"Post View Count" is an easy-to-use and lightweight post views count plugin. It allows you to display how many times a post type has been viewed.
 
 = Main Features =
 
-* Light weight plugin
+* Lightweight plugin
 * No third party dependency
-* Post views display in backend post grid.
-
+* Post views display in backend post grid
 
 = Need Help =
 
-If you’re stuck or ever have any questions or need any help regarding the use of this plugin, you can email us on [nareshparmar827@gmail.com](mailto:nareshparmar827@gmail.com).
-
+If you’re stuck or have any questions regarding the use of this plugin, you can email us at: [nareshparmar827@gmail.com](mailto:nareshparmar827@gmail.com)
 
 == Installation ==
-
-Following the steps below, you can get the post views count form up and running in seconds.
 
 1. Upload 'wp-simple-post-view' to the '/wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
@@ -43,49 +35,56 @@ Following the steps below, you can get the post views count form up and running 
 A. Contact us at: [nareshparmar827@gmail.com](mailto:nareshparmar827@gmail.com)
 
 == Changelog ==
-= 1.0 =
-* Initial release.
 
-= 1.1 =
-* Display post using order by post view - ASC/DESC order.
-
-= 1.2 =
-* Reset all post views added functionality.
-
-= 1.3 =
-* minor updates.
-
-= 1.4 =
-* Added settings page with dynamic text option : "Post View" -- This text is editable though backend.
-
-= 1.5 =
-* fixed issue "Deprecated: Non-static method"
-
-= 1.6 =
-* fixed issue "Order by filter"
-
-= 1.6.1 =
-* fixed issue "function error"
-
-= 1.8 =
-* fixed issue "Sort ASC or DSC give me critical error https://wordpress.org/support/topic/sort-asc-or-dsc-give-me-critical-error/"
-
-= 1.8.3 =
-* Bug Fix
-
-= 1.8.4 =
-* Bug Fix
-
-= 2.0 =
-* UI & Code improvements
-
-= 2.0.1 =
-* UI & Code improvements
-
-= 2.0.2 =
-* Bug fix
+= 3.1 =
+* Bug fix & Code improvements
 
 = 3.0 =
 * Bug fix
 
+= 2.0.2 =
+* Bug fix
+
+= 2.0.1 =
+* UI & Code improvements
+
+= 2.0 =
+* UI & Code improvements
+
+= 1.8.4 =
+* Bug Fix
+
+= 1.8.3 =
+* Bug Fix
+
+= 1.8 =
+* Fixed issue "Sort ASC or DSC critical error"
+
+= 1.6.1 =
+* Fixed issue "function error"
+
+= 1.6 =
+* Fixed issue "Order by filter"
+
+= 1.5 =
+* Fixed issue "Deprecated: Non-static method"
+
+= 1.4 =
+* Added settings page with editable "Post View" text
+
+= 1.3 =
+* Minor updates
+
+= 1.2 =
+* Added reset all post views functionality
+
+= 1.1 =
+* Display posts using order by post view - ASC/DESC order
+
+= 1.0 =
+* Initial release
+
 == Screenshots ==
+
+1. Backend post list showing view counts
+2. Plugin settings page
