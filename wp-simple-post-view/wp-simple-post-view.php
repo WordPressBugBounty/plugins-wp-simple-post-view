@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Post View Count
  * Description: Track how many views your posts have. Use shortcode: [ngd-single-post-view] or [ngd-single-post-view id="post_id"]
- * Version: 3.1
+ * Version: 3.3
  * Requires PHP: 7.1
  * Requires at least: 6.8
  * Text Domain: wp-simple-post-view

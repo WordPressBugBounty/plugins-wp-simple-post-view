@@ -3,8 +3,8 @@ Contributors: nareshparmar827, dipakparmar443
 Donate link: https://www.paypal.me/dipakparmar443/
 Tags: count, view, postviews, counter
 Requires at least: 6.8
-Tested up to: 6.8
-Stable tag: 3.1
+Tested up to: 7.1
+Stable tag: 3.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
